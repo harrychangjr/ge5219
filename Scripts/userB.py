@@ -3,6 +3,8 @@ print("ArcGIS version:", arcpy.GetInstallInfo()["Version"]) #to verify arcpy is 
 import requests
 import os
 
+#test comment
+
 # Set up environment
 print("Script file:", os.path.abspath(__file__))
 print("Current working directory:", os.getcwd())
