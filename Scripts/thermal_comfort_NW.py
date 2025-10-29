@@ -1,6 +1,8 @@
 import arcpy
 import os
 import requests
+import geopandas as gpd
+from shapely.geometry import Point
 arcpy.env.overwriteOutput = True
 
 ############### Obtain data & create shapefiles from NEA realtime API ###############
@@ -46,6 +48,15 @@ for s in temperature_data['data']['stations']:
     temp_points.append({'id': stn_id, 'name': stn_name, 'longitude': lon, 'latitude': lat, 'value': temp})
 print(temp_points)
 
+# Create geopandas DataFrame for temperature
+temp_gdf = gpd.GeoDataFrame(
+    temp_points,
+    geometry=[Point(p['longitude'], p['latitude']) for p in temp_points],
+    crs="EPSG:4326"  # WGS84 lat/lon
+)
+temp_gdf = temp_gdf.to_crs(epsg=3414)  # Convert to SVY21
+print(temp_gdf.head())
+
 # Save temperature points to shapefile
 temp_dir = os.path.join(data_folder, "temperature")
 temp_shp = create_shapefile(temp_points, "temp", temp_dir, "air_temperature", spatial_ref)
@@ -68,6 +79,15 @@ for s in rh_data['data']['stations']:
     rh = next((r['value'] for r in rh_data['data']['readings'][0]['data'] if r['stationId']==stn_id), None)
     rh_points.append({'id': stn_id, 'name': stn_name, 'longitude': lon, 'latitude': lat, 'value': rh})
 print(rh_points)
+
+# Create geopandas DataFrame for relative humidity
+rh_gdf = gpd.GeoDataFrame(
+    rh_points,
+    geometry=[Point(p['longitude'], p['latitude']) for p in rh_points],
+    crs="EPSG:4326"  # WGS84 lat/lon
+)
+rh_gdf = rh_gdf.to_crs(epsg=3414)  # Convert to SVY21
+print(rh_gdf.head())
 
 # Save relative humidity points to shapefile
 rh_dir = os.path.join(data_folder, "relative_humidity")
