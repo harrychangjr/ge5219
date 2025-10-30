@@ -18,7 +18,7 @@ ARCGIS_PASSWORD = "Zzr20010910-"
 # This must be your FeatureServer layer 0 URL
 # Example:
 # LAYER_URL = "https://services5.arcgis.com/xxxx/arcgis/rest/services/sg_rainfall/FeatureServer/0"
-LAYER_URL = "https://services5.arcgis.com/XXXX/arcgis/rest/services/sg_rainfall/FeatureServer/0"
+LAYER_URL = "https://services5.arcgis.com/KiRa9d9aHfdXiCqt/arcgis/rest/services/Rainfall_live/FeatureServer/0"
 
 
 def fetch_rainfall_data() -> dict:
