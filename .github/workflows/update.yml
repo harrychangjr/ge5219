@@ -2,7 +2,7 @@ name: Rainfall Realtime Updater
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/10 * * * *"   # every 10 minutes (UTC)
   workflow_dispatch:
 
 jobs:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -18,13 +18,13 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install ArcGIS Python API
+      - name: Install dependencies
         run: |
-          pip install arcgis requests
+            pip install --upgrade pip
+            pip install "arcgis==2.3.0" requests
 
       - name: Run rainfall updater
-        env:
-          ARCGIS_USERNAME: "e1025426_gis2025"
-          ARCGIS_PASSWORD: "Zzr20010910-"
+        # TEMP: hard-coded credentials inside python file
+        # Later you can move them here as env vars or secrets.
         run: |
-          python update_rainfall_layer.py
+          python update_sg_rainfall_layer.py
