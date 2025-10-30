@@ -2,7 +2,7 @@ name: Rainfall Realtime Updater
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes (UTC)
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -13,18 +13,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 👉 add this step
+      - name: Install system deps for gssapi
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y krb5-user libkrb5-dev
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      - name: Install Python deps
         run: |
-            pip install --upgrade pip
-            pip install "arcgis==2.3.0" requests
+          pip install --upgrade pip
+          pip install "arcgis==2.3.0" requests
 
       - name: Run rainfall updater
-        # TEMP: hard-coded credentials inside python file
-        # Later you can move them here as env vars or secrets.
         run: |
           python update_sg_rainfall_layer.py
