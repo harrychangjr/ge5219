@@ -24,7 +24,7 @@ jobs:
 
       - name: Run rainfall updater
         env:
-          ARCGIS_USERNAME: ${{ secrets.ARCGIS_USERNAME }}
-          ARCGIS_PASSWORD: ${{ secrets.ARCGIS_PASSWORD }}
+          ARCGIS_USERNAME: "e1025426_gis2025"
+          ARCGIS_PASSWORD: "Zzr20010910-"
         run: |
           python update_rainfall_layer.py
