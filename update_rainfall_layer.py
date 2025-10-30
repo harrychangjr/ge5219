@@ -1,112 +1,137 @@
 # ============================================================
-# update_rainfall_layer.py  (UTC-safe version)
+# update_sg_rainfall_layer.py
 # Purpose:
-#   - Fetch live rainfall from data.gov.sg
-#   - Keep timestamp in UTC (avoid double time conversion by ArcGIS Online)
-#   - Overwrite an existing hosted feature layer in ArcGIS Online
-#   - Designed to run in GitHub Actions (uses env vars)
+#   1. Fetch latest 5-min rainfall readings from data.gov.sg
+#   2. Convert them to ArcGIS features (points)
+#   3. OVERWRITE an existing hosted feature layer in ArcGIS Online
+# Notes:
+#   - This script assumes the target layer already exists in ArcGIS Online.
+#   - This script uses the timestamp provided by data.gov.sg directly.
+#   - Designed to be run on GitHub Actions (username/password via env vars).
 # ============================================================
 
 import os
 import requests
-from datetime import datetime
 from arcgis.gis import GIS
-from arcgis.features import FeatureLayer
+from arcgis.features import FeatureLayerCollection
 
-# ------------------------------------------------------------
-# 1) Read ArcGIS Online credentials from environment
-#    (GitHub Actions → Settings → Secrets → ARCGIS_USERNAME / ARCGIS_PASSWORD)
-# ------------------------------------------------------------
-arcgis_username = os.getenv("ARCGIS_USERNAME")
-arcgis_password = os.getenv("ARCGIS_PASSWORD")
 
-if not arcgis_username or not arcgis_password:
-    raise RuntimeError(
-        "ArcGIS credentials not found. "
-        "Please set ARCGIS_USERNAME and ARCGIS_PASSWORD as GitHub Secrets."
-    )
+def get_arcgis_gis() -> GIS:
+    """Log in to ArcGIS Online using environment variables."""
+    username = os.getenv("ARCGIS_USERNAME")
+    password = os.getenv("ARCGIS_PASSWORD")
+    if not username or not password:
+        raise RuntimeError(
+            "ArcGIS credentials not found. Please set ARCGIS_USERNAME and ARCGIS_PASSWORD in secrets."
+        )
+    return GIS("https://www.arcgis.com", username, password)
 
-# Connect to ArcGIS Online
-gis = GIS("https://www.arcgis.com", arcgis_username, arcgis_password)
 
-# ------------------------------------------------------------
-# 2) Target hosted feature layer (your rainfall layer)
-#    NOTE: must point to the layer (…/FeatureServer/0), not just the service
-# ------------------------------------------------------------
-layer_url = (
-    "https://services5.arcgis.com/KiRa9d9aHfdXiCqt/arcgis/rest/services/"
-    "Rainfall_live/FeatureServer/0"
-)
-layer = FeatureLayer(layer_url)
+def fetch_rainfall_data() -> dict:
+    """Fetch the latest rainfall observation from data.gov.sg."""
+    url = "https://api.data.gov.sg/v1/environment/rainfall"
+    response = requests.get(url, timeout=30)
+    response.raise_for_status()
+    return response.json()
 
-# ------------------------------------------------------------
-# 3) Call data.gov.sg rainfall API
-# ------------------------------------------------------------
-api_url = "https://api.data.gov.sg/v1/environment/rainfall"
-response = requests.get(api_url, timeout=20)
-response.raise_for_status()
-rain_data = response.json()
 
-# stations metadata → for getting lat/lon, name, etc.
-stations_by_id = {s["id"]: s for s in rain_data["metadata"]["stations"]}
+def build_feature_collection(api_data: dict) -> dict:
+    """
+    Convert data.gov.sg rainfall JSON into an ArcGIS Feature Collection dict
+    that can be used to overwrite a hosted feature layer.
+    """
+    # data.gov.sg gives us:
+    # - items[0].timestamp  -> observation time (already in +08:00)
+    # - items[0].readings[] -> station_id, value
+    # - metadata.stations[] -> id, name, location{lat, lon}
+    items = api_data.get("items", [])
+    if not items:
+        raise ValueError("No 'items' found in rainfall API response.")
 
-# latest readings block
-latest_block = rain_data["items"][0]
+    latest_item = items[0]
+    observation_time = latest_item["timestamp"]  # e.g. 2025-10-30T09:15:00+08:00
 
-# 💡 IMPORTANT:
-# Keep API timestamp as-is (UTC) to avoid ArcGIS double-converting it.
-reading_time_iso = latest_block["timestamp"]  # e.g. "2025-10-30T09:20:00+00:00"
+    readings_list = latest_item.get("readings", [])
+    readings_by_station = {r["station_id"]: r["value"] for r in readings_list}
 
-# ------------------------------------------------------------
-# 4) Build list of features to push to ArcGIS
-# ------------------------------------------------------------
-features = []
+    stations = api_data["metadata"]["stations"]
 
-for reading in latest_block["readings"]:
-    station = stations_by_id.get(reading["station_id"])
-    if not station:
-        # station not found in metadata — skip it
-        continue
+    features = []
+    for station in stations:
+        station_id = station["id"]
+        rainfall_value = readings_by_station.get(station_id, None)
 
-    lon = float(station["location"]["longitude"])
-    lat = float(station["location"]["latitude"])
+        feature = {
+            "attributes": {
+                "station_id": station_id,
+                "station_name": station.get("name"),
+                "rainfall_mm": rainfall_value,
+                "obs_time": observation_time,
+            },
+            "geometry": {
+                "x": station["location"]["longitude"],
+                "y": station["location"]["latitude"],
+                "spatialReference": {"wkid": 4326},
+            },
+        }
+        features.append(feature)
 
-    feature = {
-        "geometry": {
-            "x": lon,
-            "y": lat,
-            "spatialReference": {"wkid": 4326},
-        },
-        "attributes": {
-            "station_id": reading["station_id"],
-            "station_name": station["name"],
-            "rain_mm": reading.get("value"),
-            # store UTC time
-            "reading_time": reading_time_iso,
-        },
+    # Build the Feature Collection payload
+    feature_collection = {
+        "layers": [
+            {
+                "layerDefinition": {
+                    "name": "sg_rainfall",
+                    "geometryType": "esriGeometryPoint",
+                    "fields": [
+                        {"name": "station_id", "type": "esriFieldTypeString"},
+                        {"name": "station_name", "type": "esriFieldTypeString"},
+                        {"name": "rainfall_mm", "type": "esriFieldTypeDouble"},
+                        {"name": "obs_time", "type": "esriFieldTypeString"},
+                    ],
+                },
+                "featureSet": {
+                    "features": features,
+                    "geometryType": "esriGeometryPoint",
+                },
+            }
+        ]
     }
-    features.append(feature)
 
-# ------------------------------------------------------------
-# 5) Overwrite the hosted layer: delete all → insert new
-# ------------------------------------------------------------
-try:
-    # delete all existing rows
-    layer.delete_features(where="1=1")
+    return feature_collection, observation_time
 
-    # insert latest readings
-    edit_result = layer.edit_features(adds=features)
 
-    # log for GitHub Actions
-    print(
-        f"[{datetime.utcnow().isoformat()}Z] ✅ Updated {len(features)} features "
-        f"with reading_time={reading_time_iso}"
-    )
-    print("ArcGIS response:", edit_result)
+def overwrite_arcgis_layer(gis: GIS, layer_url: str, feature_collection: dict) -> None:
+    """
+    Overwrite the existing hosted feature layer with the new feature collection.
+    This will replace ALL existing features.
+    """
+    flc = FeatureLayerCollection.fromurl(layer_url, gis=gis)
+    flc.manager.overwrite(feature_collection)
 
-except Exception as exc:
-    # print to Actions log and fail the job
-    print(
-        f"[{datetime.utcnow().isoformat()}Z] ❌ Failed to update rainfall layer: {exc}"
-    )
-    raise
+
+def main():
+    # 1. Connect to ArcGIS Online
+    gis = get_arcgis_gis()
+
+    # 2. Target layer URL (FeatureServer/0)
+    #    IMPORTANT: replace this with your actual layer URL
+    layer_url = os.getenv("ARCGIS_LAYER_URL")
+    if not layer_url:
+        # fallback to hard-coded value if needed
+        layer_url = "https://services5.arcgis.com/XXXX/arcgis/rest/services/sg_rainfall/FeatureServer/0"
+
+    # 3. Fetch latest rainfall data
+    rainfall_data = fetch_rainfall_data()
+
+    # 4. Convert to feature collection
+    feature_collection, obs_time = build_feature_collection(rainfall_data)
+
+    # 5. Overwrite hosted layer
+    overwrite_arcgis_layer(gis, layer_url, feature_collection)
+
+    print(f"✅ Rainfall layer overwritten successfully at {obs_time}")
+
+
+if __name__ == "__main__":
+    main()
