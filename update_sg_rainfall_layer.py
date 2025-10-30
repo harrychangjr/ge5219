@@ -35,7 +35,7 @@ def build_features(api_data: dict) -> tuple[list, str]:
         raise ValueError("No items in rainfall API response.")
 
     latest_item = items[0]
-    reading_time = latest_item["timestamp"]  # already in +08:00
+    reading_time = latest_item["timestamp"].replace("+08:00", "")
 
     readings_by_station = {r["station_id"]: r["value"] for r in latest_item.get("readings", [])}
     stations = api_data["metadata"]["stations"]
