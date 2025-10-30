@@ -1,42 +1,44 @@
 # ============================================================
 # update_sg_rainfall_layer.py
-# Fetch 5-min rainfall from data.gov.sg and overwrite an
-# ArcGIS Online hosted feature layer.
-# TEMP VERSION: username/password are hard-coded.
+# Purpose:
+#   1. Fetch 5-min rainfall data from data.gov.sg
+#   2. Clear (truncate) an existing ArcGIS Online feature layer
+#   3. Insert the latest features
 # ============================================================
 
 import requests
 from arcgis.gis import GIS
-from arcgis.features import FeatureLayerCollection
+from arcgis.features import FeatureLayer
 
 # ------------------------------------------------------------
-# 1. TEMP credentials (you can move them to env/secrets later)
+# TEMP: hard-coded credentials (move to env/secrets later)
 # ------------------------------------------------------------
 ARCGIS_USERNAME = "e1025426_gis2025"
 ARCGIS_PASSWORD = "Zzr20010910-"
 
-# This must be your FeatureServer layer 0 URL
-# Example:
-# LAYER_URL = "https://services5.arcgis.com/xxxx/arcgis/rest/services/sg_rainfall/FeatureServer/0"
+# Your FeatureServer layer 0 URL
 LAYER_URL = "https://services5.arcgis.com/KiRa9d9aHfdXiCqt/arcgis/rest/services/Rainfall_live/FeatureServer/0"
 
 
 def fetch_rainfall_data() -> dict:
-    """Download latest rainfall JSON from data.gov.sg."""
+    """Fetch the latest rainfall JSON from data.gov.sg."""
     url = "https://api.data.gov.sg/v1/environment/rainfall"
     resp = requests.get(url, timeout=30)
     resp.raise_for_status()
     return resp.json()
 
 
-def build_feature_collection(api_data: dict) -> tuple[dict, str]:
-    """Convert data.gov.sg JSON to ArcGIS Feature Collection (for overwrite)."""
+def build_features(api_data: dict) -> tuple[list, str]:
+    """
+    Convert data.gov.sg JSON to a list of ArcGIS features.
+    Returns: (features, observation_time)
+    """
     items = api_data.get("items", [])
     if not items:
-        raise ValueError("No 'items' in rainfall API response.")
+        raise ValueError("No items in rainfall API response.")
 
     latest_item = items[0]
-    obs_time = latest_item["timestamp"]  # already in +08:00
+    observation_time = latest_item["timestamp"]  # already in +08:00
 
     readings_by_station = {r["station_id"]: r["value"] for r in latest_item.get("readings", [])}
     stations = api_data["metadata"]["stations"]
@@ -44,12 +46,14 @@ def build_feature_collection(api_data: dict) -> tuple[dict, str]:
     features = []
     for station in stations:
         station_id = station["id"]
+        rainfall_mm = readings_by_station.get(station_id, None)
+
         feature = {
             "attributes": {
                 "station_id": station_id,
                 "station_name": station.get("name"),
-                "rainfall_mm": readings_by_station.get(station_id, None),
-                "obs_time": obs_time,
+                "rainfall_mm": rainfall_mm,
+                "obs_time": observation_time,
             },
             "geometry": {
                 "x": station["location"]["longitude"],
@@ -59,50 +63,30 @@ def build_feature_collection(api_data: dict) -> tuple[dict, str]:
         }
         features.append(feature)
 
-    feature_collection = {
-        "layers": [
-            {
-                "layerDefinition": {
-                    "name": "sg_rainfall",
-                    "geometryType": "esriGeometryPoint",
-                    "fields": [
-                        {"name": "station_id", "type": "esriFieldTypeString"},
-                        {"name": "station_name", "type": "esriFieldTypeString"},
-                        {"name": "rainfall_mm", "type": "esriFieldTypeDouble"},
-                        {"name": "obs_time", "type": "esriFieldTypeString"},
-                    ],
-                },
-                "featureSet": {
-                    "features": features,
-                    "geometryType": "esriGeometryPoint",
-                },
-            }
-        ]
-    }
-
-    return feature_collection, obs_time
-
-
-def overwrite_layer(feature_collection: dict, gis: GIS, layer_url: str) -> None:
-    """Overwrite existing hosted feature layer."""
-    flc = FeatureLayerCollection.fromurl(layer_url, gis=gis)
-    flc.manager.overwrite(feature_collection)
+    return features, observation_time
 
 
 def main():
     # 1. login
     gis = GIS("https://www.arcgis.com", ARCGIS_USERNAME, ARCGIS_PASSWORD)
 
-    # 2. get rainfall
+    # 2. bind to the feature layer
+    layer = FeatureLayer(LAYER_URL, gis=gis)
+
+    # 3. fetch latest rainfall
     rainfall_data = fetch_rainfall_data()
 
-    # 3. convert to feature collection
-    fc, obs_time = build_feature_collection(rainfall_data)
+    # 4. convert to features
+    features, obs_time = build_features(rainfall_data)
 
-    # 4. overwrite AGOL layer
-    overwrite_layer(fc, gis, LAYER_URL)
+    # 5. clear existing features (this is our "overwrite")
+    #    NOTE: this requires that your user is the owner or has edit rights.
+    layer.manager.truncate()
 
-    print(f"✅ Rainfall layer overwritten at {obs_time}")
+    # 6. add latest features
+    layer.edit_features(adds=features)
+
+    print(f"✅ Rainfall layer refreshed at {obs_time} with {len(features)} stations.")
 
 
 if __name__ == "__main__":
