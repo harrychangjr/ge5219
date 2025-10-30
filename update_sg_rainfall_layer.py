@@ -29,16 +29,13 @@ def fetch_rainfall_data() -> dict:
 
 
 def build_features(api_data: dict) -> tuple[list, str]:
-    """
-    Convert data.gov.sg JSON to a list of ArcGIS features.
-    Returns: (features, observation_time)
-    """
+    """Convert data.gov.sg JSON to a list of ArcGIS features."""
     items = api_data.get("items", [])
     if not items:
         raise ValueError("No items in rainfall API response.")
 
     latest_item = items[0]
-    observation_time = latest_item["timestamp"]  # already in +08:00
+    reading_time = latest_item["timestamp"]  # already in +08:00
 
     readings_by_station = {r["station_id"]: r["value"] for r in latest_item.get("readings", [])}
     stations = api_data["metadata"]["stations"]
@@ -53,7 +50,7 @@ def build_features(api_data: dict) -> tuple[list, str]:
                 "station_id": station_id,
                 "station_name": station.get("name"),
                 "rainfall_mm": rainfall_mm,
-                "obs_time": observation_time,
+                "reading_time": reading_time, 
             },
             "geometry": {
                 "x": station["location"]["longitude"],
@@ -63,30 +60,29 @@ def build_features(api_data: dict) -> tuple[list, str]:
         }
         features.append(feature)
 
-    return features, observation_time
+    return features, reading_time
 
 
 def main():
-    # 1. login
+    # 1. Log in
     gis = GIS("https://www.arcgis.com", ARCGIS_USERNAME, ARCGIS_PASSWORD)
 
-    # 2. bind to the feature layer
+    # 2. Bind to the hosted layer
     layer = FeatureLayer(LAYER_URL, gis=gis)
 
-    # 3. fetch latest rainfall
+    # 3. Fetch rainfall data
     rainfall_data = fetch_rainfall_data()
 
-    # 4. convert to features
-    features, obs_time = build_features(rainfall_data)
+    # 4. Convert to features
+    features, reading_time = build_features(rainfall_data)
 
-    # 5. clear existing features (this is our "overwrite")
-    #    NOTE: this requires that your user is the owner or has edit rights.
-    layer.manager.truncate()
+    # 5. Clear all existing records
+    layer.manager.truncate()   # or: layer.delete_features(where="1=1")
 
-    # 6. add latest features
+    # 6. Insert latest data
     layer.edit_features(adds=features)
 
-    print(f"✅ Rainfall layer refreshed at {obs_time} with {len(features)} stations.")
+    print(f"✅ Rainfall layer refreshed at {reading_time} with {len(features)} stations.")
 
 
 if __name__ == "__main__":
