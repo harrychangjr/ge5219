@@ -1,0 +1,30 @@
+name: Update Rainfall Layer Every 10 Minutes
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes
+  workflow_dispatch:          # allow manual run
+
+jobs:
+  run-updater:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: "3.10"
+
+      - name: Install ArcGIS Python API
+        run: |
+          pip install arcgis requests
+
+      - name: Run rainfall updater
+        env:
+          ARCGIS_USERNAME: ${{ secrets.ARCGIS_USERNAME }}
+          ARCGIS_PASSWORD: ${{ secrets.ARCGIS_PASSWORD }}
+        run: |
+          python update_sg_rainfall_layer.py
