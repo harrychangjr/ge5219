@@ -1,4 +1,5 @@
 import arcpy
+print("ArcGIS version:", arcpy.GetInstallInfo()["Version"])
 import os
 import requests
 import geopandas as gpd
@@ -93,3 +94,12 @@ print(rh_gdf.head())
 rh_dir = os.path.join(data_folder, "relative_humidity")
 rh_shp = create_shapefile(rh_points, "rh", rh_dir, "relative_humidity", spatial_ref)
 print("Relative humidity shapefile created:", os.path.abspath(rh_shp))
+
+############### Generate continuous rasters ###############
+# Link to Singapore boundary shapefile used for clipping and masking rasters
+singapore_boundary = os.path.join(data_folder, "planning_area_boundary", "planning_area_boundary.shp")
+if arcpy.Exists(singapore_boundary):
+    print("Shapefile is ready to use.")
+else:
+    print("Shapefile not found — check the path.")
+print("Singapore boundary path:", singapore_boundary)
