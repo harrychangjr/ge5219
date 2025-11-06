@@ -16,7 +16,7 @@ print("✅ Loaded pure-Python GIS stack (IDW version, no ArcPy)")
 # --------------------------------------------------------
 mapbox_username = "nw03"
 DATASET_NAME = "nea_points"
-mapbox_access_token = "sk.YOUR_SECRET_TOKEN_IF_NEEDED"
+mapbox_access_token = "sk.eyJ1IjoibncwMyIsImEiOiJjbWhuaDYxdnMwMGhmMmlyenFycXNoM2tzIn0.d0oaGmXCmqMxFiG124kIbA"
 
 script_dir = os.getcwd()
 data_folder = os.path.join(script_dir, "Data")
