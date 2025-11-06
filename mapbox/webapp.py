@@ -15,11 +15,13 @@ print("✅ Loaded pure-Python GIS stack (IDW version, no ArcPy)")
 # CONFIGURATION
 # --------------------------------------------------------
 mapbox_username = "nw03"
-DATASET_NAME = "nea_points"
+dataset_name = "nea_points"
 mapbox_access_token = "sk.eyJ1IjoibncwMyIsImEiOiJjbWhuaDYxdnMwMGhmMmlyenFycXNoM2tzIn0.d0oaGmXCmqMxFiG124kIbA"
 
 script_dir = os.getcwd()
 data_folder = os.path.join(script_dir, "Data")
+web_folder = os.path.join(data_folder, "web")
+os.makedirs(web_folder, exist_ok=True)
 
 boundary_shp = os.path.join(
     data_folder, "planning_area_boundary", "planning_area_boundary.shp"
@@ -171,6 +173,67 @@ def normalize_0_100(arr):
     return norm.astype("float32")
 
 # --------------------------------------------------------
+# Convert normalized raster → 8-bit TIFF
+# --------------------------------------------------------
+def convert_to_8bit(in_tif, out_tif):
+    with rasterio.open(in_tif) as src:
+        data = src.read(1)
+        meta = src.meta.copy()
+        scaled = np.clip(data, 0, 100) / 100 * 255
+        meta.update(dtype="uint8")
+
+    with rasterio.open(out_tif, "w", **meta) as dst:
+        dst.write(scaled.astype("uint8"), 1)
+    print(f"🌐 Converted to 8-bit TIFF → {out_tif}")
+
+# --------------------------------------------------------
+# Mapbox Uploads API
+# --------------------------------------------------------
+import boto3
+import json
+import requests
+
+def upload_to_mapbox(file_path, username, dataset_name, access_token):
+    """Upload a GeoJSON or GeoTIFF to Mapbox automatically."""
+    print(f"🚀 Uploading {os.path.basename(file_path)} to Mapbox...")
+
+    creds_url = f"https://api.mapbox.com/uploads/v1/{username}/credentials?access_token={access_token}"
+    creds = requests.post(creds_url)
+    creds.raise_for_status()
+    creds_json = creds.json()
+    print("DEBUG credentials response:", creds_json)
+
+    if "fields" in creds_json and "url" in creds_json:
+        s3_url = creds_json["url"]
+        s3_fields = creds_json["fields"]
+        with open(file_path, "rb") as f:
+            files = {"file": (os.path.basename(file_path), f)}
+            resp = requests.post(s3_url, data=s3_fields, files=files)
+            resp.raise_for_status()
+        upload_url = s3_url + "/" + s3_fields["key"]
+    elif all(k in creds_json for k in ("bucket", "key", "accessKeyId", "secretAccessKey", "sessionToken")):
+        s3 = boto3.client(
+            "s3",
+            aws_access_key_id=creds_json["accessKeyId"],
+            aws_secret_access_key=creds_json["secretAccessKey"],
+            aws_session_token=creds_json["sessionToken"],
+            region_name="us-east-1"
+        )
+        with open(file_path, "rb") as f:
+            s3.upload_fileobj(f, creds_json["bucket"], creds_json["key"])
+        upload_url = f"https://{creds_json['bucket']}.s3.amazonaws.com/{creds_json['key']}"
+    else:
+        print("❌ Unrecognized credentials response:")
+        print(json.dumps(creds_json, indent=2))
+        raise RuntimeError("Mapbox did not return recognizable upload credentials.")
+
+    tileset = f"{username}.{dataset_name}"
+    body = {"url": upload_url, "tileset": tileset, "name": dataset_name}
+    resp = requests.post(f"https://api.mapbox.com/uploads/v1/{username}?access_token={access_token}", json=body)
+    resp.raise_for_status()
+    print(f"✅ {dataset_name} uploaded to Mapbox. Processing may take 1–3 min.")
+
+# --------------------------------------------------------
 # MAIN
 # --------------------------------------------------------
 def main():
@@ -189,24 +252,45 @@ def main():
     print("Interpolating Temperature (IDW)…")
     T_arr, T_transform = idw_interpolate(pts, "T", boundary)
     save_and_clip_raster(T_arr, T_transform, SVY21_EPSG, boundary, temp_ras)
-    print(f"✅ Saved {temp_ras}")
 
     print("Interpolating Relative Humidity (IDW)…")
     RH_arr, RH_transform = idw_interpolate(pts, "RH", boundary)
     save_and_clip_raster(RH_arr, RH_transform, SVY21_EPSG, boundary, rh_ras)
-    print(f"✅ Saved {rh_ras}")
 
     print("Computing Humidex raster…")
     H_arr = compute_humidex_raster(T_arr, RH_arr)
     save_and_clip_raster(H_arr, T_transform, SVY21_EPSG, boundary, humidex_ras)
-    print(f"✅ Saved {humidex_ras}")
 
     print("Normalizing Humidex to 0–100…")
     H_norm = normalize_0_100(H_arr)
     save_and_clip_raster(H_norm, T_transform, SVY21_EPSG, boundary, humidex_ras_norm)
-    print(f"✅ Saved normalized Humidex → {humidex_ras_norm}")
 
     print("🎉 Done. All rasters SVY21, clipped, IDW-interpolated.")
+
+    # --------------------------------------------------------
+    # Prepare web-safe exports for Mapbox
+    # --------------------------------------------------------
+    print("🌍 Preparing web-safe layers for Mapbox...")
+
+    # 1️⃣ Points → WGS84
+    pts_wgs84 = pts.to_crs(epsg=4326)
+    points_geojson_web = os.path.join(web_folder, "nea_environment_points_wgs84.geojson")
+    pts_wgs84.to_file(points_geojson_web, driver="GeoJSON")
+
+    # 2️⃣ Normalized humidex → 8-bit TIFF
+    humidex_8bit = os.path.join(web_folder, "humidex_norm_8bit.tif")
+    convert_to_8bit(humidex_ras_norm, humidex_8bit)
+
+    # --------------------------------------------------------
+    # Upload to Mapbox
+    # --------------------------------------------------------
+    print("Uploading to Mapbox...")
+    token = os.getenv("MAPBOX_TOKEN") or mapbox_access_token
+
+    upload_to_mapbox(points_geojson_web, mapbox_username, dataset_name, token)
+    upload_to_mapbox(humidex_8bit, mapbox_username, "humidex_raster", token)
+
+    print("🎉 All uploads sent to Mapbox.")
 
 if __name__ == "__main__":
     main()
