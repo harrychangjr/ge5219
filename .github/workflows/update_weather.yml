@@ -1,3 +1,5 @@
+name: Update Humidex and NEA Layers
+
 on:
   schedule:
     - cron: "*/10 * * * *"  # every 10 minutes (UTC)
@@ -8,30 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # 1️⃣ Install system dependencies (for gssapi)
-      - name: Install system packages
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y krb5-user libkrb5-dev
 
       # 2️⃣ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: "pip"  # ✅ enable built-in pip cache
 
-      # 3️⃣ Install dependencies (cached)
-      - name: Install dependencies
+      # 3️⃣ Install Python dependencies
+      - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install "arcgis==2.3.0" requests
+          pip install requests geopandas
 
-      # 4️⃣ Run weather updater script
+      # ⚠️ Note: ArcPy won't work on Ubuntu. Skip ArcPy-only code or wrap it in try/except in Python.
+
+      # 4️⃣ Run the updater script
       - name: Run weather updater
+        env:
+          MAPBOX_ACCESS_TOKEN: sk.eyJ1IjoibncwMyIsImEiOiJjbWhuaDYxdnMwMGhmMmlyenFycXNoM2tzIn0.d0oaGmXCmqMxFiG124kIbA
         run: |
-          python update_rh_temp.py
+          python mapbox/webapp.py
 
+      # 5️⃣ Commit and push updated files
+      - name: Commit and push updated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add Data/nea_environment_points.geojson
+          git add Data/humidex_svy21_norm.tif
+
+          # Commit only if there are changes
+          git diff --cached --quiet || git commit -m "Auto-update NEA layers"
+          git push
