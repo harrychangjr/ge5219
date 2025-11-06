@@ -1,3 +1,39 @@
+name: Update Humidex and NEA Layers
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # every 10 minutes (UTC)
+  workflow_dispatch:        # <-- only defines manual trigger
+
+jobs:
+  run-updater:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # 3️⃣ Install dependencies
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install requests geopandas shapely rasterio pyproj boto3 numpy
+
+      # 4️⃣ Run the updater script
+      - name: Run weather updater
+        env:
+          MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+        run: |
+          python mapbox/webapp.py
+
+      # 5️⃣ Commit and push updated files
       - name: Commit and push updated files
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
