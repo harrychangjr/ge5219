@@ -20,18 +20,16 @@ jobs:
         with:
           python-version: "3.10"
 
-      # 3️⃣ Install Python dependencies
+      # 3️⃣ Install dependencies
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install requests geopandas
-
-      # ⚠️ Note: ArcPy won't work on Ubuntu. Skip ArcPy-only code or wrap it in try/except in Python.
+          pip install requests geopandas shapely rasterio pyproj boto3 numpy
 
       # 4️⃣ Run the updater script
       - name: Run weather updater
         env:
-          MAPBOX_ACCESS_TOKEN: sk.eyJ1IjoibncwMyIsImEiOiJjbWhuaDYxdnMwMGhmMmlyenFycXNoM2tzIn0.d0oaGmXCmqMxFiG124kIbA
+          MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
         run: |
           python mapbox/webapp.py
 
@@ -41,9 +39,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add Data/nea_environment_points.geojson
-          git add Data/humidex_svy21_norm.tif
+          git add Data/nea_environment_points.geojson || true
+          git add Data/humidex_svy21_norm.tif || true
+          git add Data/web/nea_environment_points_wgs84.geojson || true
+          git add Data/web/humidex_norm_8bit.tif || true
 
-          # Commit only if there are changes
           git diff --cached --quiet || git commit -m "Auto-update NEA layers"
           git push
