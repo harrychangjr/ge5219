@@ -1,0 +1,917 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.98409,
+          1.34392
+        ]
+      },
+      "properties": {
+        "station_id": "S224",
+        "station_name": "Airport Boulevard",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8125,
+          1.2937
+        ]
+      },
+      "properties": {
+        "station_id": "S77",
+        "station_name": "Alexandra Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.85335,
+          1.36019
+        ]
+      },
+      "properties": {
+        "station_id": "S216",
+        "station_name": "Ang Mo Kio Avenue 10",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8492,
+          1.3764
+        ]
+      },
+      "properties": {
+        "station_id": "S109",
+        "station_name": "Ang Mo Kio Avenue 5",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.679,
+          1.256
+        ]
+      },
+      "properties": {
+        "station_id": "S117",
+        "station_name": "Banyan Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.85526,
+          1.35041
+        ]
+      },
+      "properties": {
+        "station_id": "S217",
+        "station_name": "Bishan Street 13",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7603,
+          1.3824
+        ]
+      },
+      "properties": {
+        "station_id": "S64",
+        "station_name": "Bukit Panjang Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8191,
+          1.3191
+        ]
+      },
+      "properties": {
+        "station_id": "S90",
+        "station_name": "Bukit Timah Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.00317,
+          1.3136
+        ]
+      },
+      "properties": {
+        "station_id": "S208",
+        "station_name": "Changi East Close",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.76714,
+          1.32311
+        ]
+      },
+      "properties": {
+        "station_id": "S201",
+        "station_name": "Clementi Park",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7768,
+          1.3337
+        ]
+      },
+      "properties": {
+        "station_id": "S50",
+        "station_name": "Clementi Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.89797,
+          1.38666
+        ]
+      },
+      "properties": {
+        "station_id": "S220",
+        "station_name": "Compassvale Lane",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8097,
+          1.32427
+        ]
+      },
+      "properties": {
+        "station_id": "S213",
+        "station_name": "Coronation Walk",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9625,
+          1.3135
+        ]
+      },
+      "properties": {
+        "station_id": "S107",
+        "station_name": "East Coast Parkway",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.88899,
+          1.32785
+        ]
+      },
+      "properties": {
+        "station_id": "S215",
+        "station_name": "Geylang East Central",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.82364,
+          1.28987
+        ]
+      },
+      "properties": {
+        "station_id": "S222",
+        "station_name": "Henderson Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.89088,
+          1.35691
+        ]
+      },
+      "properties": {
+        "station_id": "S221",
+        "station_name": "Hougang Avenue 1",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.71,
+          1.3081
+        ]
+      },
+      "properties": {
+        "station_id": "S33",
+        "station_name": "Jurong Pier Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.72195,
+          1.35167
+        ]
+      },
+      "properties": {
+        "station_id": "S229",
+        "station_name": "Jurong West Street 42",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.70073,
+          1.34703
+        ]
+      },
+      "properties": {
+        "station_id": "S228",
+        "station_name": "Jurong West Street 73",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7815,
+          1.2923
+        ]
+      },
+      "properties": {
+        "station_id": "S71",
+        "station_name": "Kent Ridge Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8878,
+          1.3399
+        ]
+      },
+      "properties": {
+        "station_id": "S43",
+        "station_name": "Kim Chuan Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.75711,
+          1.42918
+        ]
+      },
+      "properties": {
+        "station_id": "S211",
+        "station_name": "Kranji Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7363,
+          1.4387
+        ]
+      },
+      "properties": {
+        "station_id": "S66",
+        "station_name": "Kranji Way",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.70131,
+          1.43854
+        ]
+      },
+      "properties": {
+        "station_id": "S112",
+        "station_name": "Lim Chu Kang Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8334,
+          1.3415
+        ]
+      },
+      "properties": {
+        "station_id": "S07",
+        "station_name": "Lornie Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.78962,
+          1.4044
+        ]
+      },
+      "properties": {
+        "station_id": "S40",
+        "station_name": "Mandai Lake Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.80264,
+          1.29984
+        ]
+      },
+      "properties": {
+        "station_id": "S223",
+        "station_name": "Margaret Drive",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8703,
+          1.2799
+        ]
+      },
+      "properties": {
+        "station_id": "S108",
+        "station_name": "Marina Gardens Drive",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9104,
+          1.30648
+        ]
+      },
+      "properties": {
+        "station_id": "S113",
+        "station_name": "Marine Parade Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.68166,
+          1.34583
+        ]
+      },
+      "properties": {
+        "station_id": "S44",
+        "station_name": "Nanyang Avenue",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7556,
+          1.3329
+        ]
+      },
+      "properties": {
+        "station_id": "S35",
+        "station_name": "Old Toh Tuck Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7702,
+          1.29164
+        ]
+      },
+      "properties": {
+        "station_id": "S203",
+        "station_name": "Pasir Panjang",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9528,
+          1.3662
+        ]
+      },
+      "properties": {
+        "station_id": "S94",
+        "station_name": "Pasir Ris Street 51",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9007,
+          1.3524
+        ]
+      },
+      "properties": {
+        "station_id": "S06",
+        "station_name": "Paya Lebar",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.89067,
+          1.30703
+        ]
+      },
+      "properties": {
+        "station_id": "S78",
+        "station_name": "Poole Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9673,
+          1.4168
+        ]
+      },
+      "properties": {
+        "station_id": "S106",
+        "station_name": "Pulau Ubin",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9092,
+          1.4029
+        ]
+      },
+      "properties": {
+        "station_id": "S81",
+        "station_name": "Punggol Central",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8365,
+          1.31055
+        ]
+      },
+      "properties": {
+        "station_id": "S111",
+        "station_name": "Scotts Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.86922,
+          1.41284
+        ]
+      },
+      "properties": {
+        "station_id": "S900",
+        "station_name": "Seletar Aerospace View",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.768,
+          1.189
+        ]
+      },
+      "properties": {
+        "station_id": "S102",
+        "station_name": "Semakau Landfill",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8279,
+          1.25
+        ]
+      },
+      "properties": {
+        "station_id": "S60",
+        "station_name": "Sentosa",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9444,
+          1.3437
+        ]
+      },
+      "properties": {
+        "station_id": "S84",
+        "station_name": "Simei Avenue",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8372,
+          1.3004
+        ]
+      },
+      "properties": {
+        "station_id": "S79",
+        "station_name": "Somerset Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.7886,
+          1.2841
+        ]
+      },
+      "properties": {
+        "station_id": "S92",
+        "station_name": "South Buona Vista Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.88289,
+          1.29911
+        ]
+      },
+      "properties": {
+        "station_id": "S214",
+        "station_name": "Tanjong Rhu",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8482,
+          1.3427
+        ]
+      },
+      "properties": {
+        "station_id": "S88",
+        "station_name": "Toa Payoh North",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8577,
+          1.3214
+        ]
+      },
+      "properties": {
+        "station_id": "S123",
+        "station_name": "Towner Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.61843,
+          1.29377
+        ]
+      },
+      "properties": {
+        "station_id": "S115",
+        "station_name": "Tuas South Avenue 3",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.9826,
+          1.3678
+        ]
+      },
+      "properties": {
+        "station_id": "S24",
+        "station_name": "Upper Changi Road North",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.805,
+          1.37
+        ]
+      },
+      "properties": {
+        "station_id": "S69",
+        "station_name": "Upper Peirce Reservoir Park",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8271,
+          1.3701
+        ]
+      },
+      "properties": {
+        "station_id": "S08",
+        "station_name": "Upper Thomson Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.76444,
+          1.30167
+        ]
+      },
+      "properties": {
+        "station_id": "S230",
+        "station_name": "West Coast Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.76904,
+          1.44003
+        ]
+      },
+      "properties": {
+        "station_id": "S210",
+        "station_name": "Woodlands Centre",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.80389,
+          1.43944
+        ]
+      },
+      "properties": {
+        "station_id": "S227",
+        "station_name": "Woodlands Drive 62",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.87643,
+          1.37999
+        ]
+      },
+      "properties": {
+        "station_id": "S219",
+        "station_name": "Yio Chu Kang Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.84472,
+          1.42111
+        ]
+      },
+      "properties": {
+        "station_id": "S209",
+        "station_name": "Yishun Ring Road",
+        "rainfall_mm_hr": 0,
+        "reading_time": "2025-11-07T16:10:00+08:00"
+      }
+    }
+  ]
+}

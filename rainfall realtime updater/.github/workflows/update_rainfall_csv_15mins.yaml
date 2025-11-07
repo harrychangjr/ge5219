@@ -1,0 +1,66 @@
+name: Rainfall CSV (every 15 min)
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 min, UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write    # allow committing CSV back to repo
+
+concurrency:
+  group: rainfall-csv
+  cancel-in-progress: true
+
+jobs:
+  build-csv:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas
+
+      # 👉 Run your script into a fixed folder inside the repo
+      - name: Make output folder
+        run: mkdir -p data
+
+      - name: Fetch latest rainfall -> CSV
+        run: |
+          python "rainfall_realtime/fetch_latest_rainfall_to_csv.py" \
+            --out_dir "data" \
+            --geojson
+        env:
+          # If your script needs API keys, set them in repo:
+          # Settings → Secrets and variables → Actions
+          # DATA_GOV_SG_API_KEY: ${{ secrets.DATA_GOV_SG_API_KEY }}
+          # Then uncomment the next line and make your script read it.
+          # DATA_GOV_SG_API_KEY: ${{ secrets.DATA_GOV_SG_API_KEY }}
+
+      # Always keep ONLY the latest file names; remove timestamped files if any
+      - name: Keep only fixed filenames
+        run: |
+          shopt -s nullglob
+          # Keep these two canonical files (script should create them):
+          #   data/rainfall_latest.csv
+          #   data/rainfall_latest.geojson
+          for f in data/rainfall_latest_*.csv data/rainfall_latest_*.geojson; do
+            rm -f "$f"
+          done
+
+      - name: Commit updated CSV/GeoJSON
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update rainfall_latest.csv (automated)"
+          file_pattern: |
+            data/rainfall_latest.csv
+            data/rainfall_latest.geojson

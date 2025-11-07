@@ -1,0 +1,32 @@
+# --- Python / OS cruft ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+*.log
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editors / IDE
+.vscode/
+.idea/
+
+# Local env/config secrets
+.env
+*.secrets
+secrets.json
+
+# If you do NOT want to version outputs, uncomment the two lines below
+# outputs/
+# outputs/*
+
+# Mac / Windows
+.DS_Store
+Thumbs.db
