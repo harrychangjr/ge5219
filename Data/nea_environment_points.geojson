@@ -3,13 +3,11 @@
 "name": "nea_environment_points",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3414" } },
 "features": [
-{ "type": "Feature", "properties": { "station_id": "S109", "T": 29.4, "RH": 68.3 }, "geometry": { "type": "Point", "coordinates": [ 29767.405062546793488, 39820.840349111203977 ] } },
-{ "type": "Feature", "properties": { "station_id": "S107", "T": 29.0, "RH": 75.9 }, "geometry": { "type": "Point", "coordinates": [ 42376.668866655483725, 32866.045473164405848 ] } },
-{ "type": "Feature", "properties": { "station_id": "S44", "T": 28.0, "RH": 82.7 }, "geometry": { "type": "Point", "coordinates": [ 11122.050410726111295, 36441.084454908545013 ] } },
-{ "type": "Feature", "properties": { "station_id": "S106", "T": 26.7, "RH": 94.1 }, "geometry": { "type": "Point", "coordinates": [ 42910.228092944926175, 44288.492814566285233 ] } },
-{ "type": "Feature", "properties": { "station_id": "S111", "T": 28.9, "RH": 68.7 }, "geometry": { "type": "Point", "coordinates": [ 28354.062126312273904, 32539.478435395925771 ] } },
-{ "type": "Feature", "properties": { "station_id": "S102", "T": 29.7, "RH": 79.0 }, "geometry": { "type": "Point", "coordinates": [ 20730.322490422415285, 19099.196756778685085 ] } },
-{ "type": "Feature", "properties": { "station_id": "S115", "T": 29.7, "RH": 81.8 }, "geometry": { "type": "Point", "coordinates": [ 4084.713818862532207, 30685.044975507225899 ] } },
-{ "type": "Feature", "properties": { "station_id": "S24", "T": 28.4, "RH": 72.1 }, "geometry": { "type": "Point", "coordinates": [ 44613.247302534844493, 38870.406742046397994 ] } }
+{ "type": "Feature", "properties": { "station_id": "S107", "T": 29.2, "RH": 69.2 }, "geometry": { "type": "Point", "coordinates": [ 42376.668866655483725, 32866.045473164405848 ] } },
+{ "type": "Feature", "properties": { "station_id": "S44", "T": 28.6, "RH": 73.2 }, "geometry": { "type": "Point", "coordinates": [ 11122.050410726111295, 36441.084454908545013 ] } },
+{ "type": "Feature", "properties": { "station_id": "S106", "T": 26.1, "RH": 94.7 }, "geometry": { "type": "Point", "coordinates": [ 42910.228092944926175, 44288.492814566285233 ] } },
+{ "type": "Feature", "properties": { "station_id": "S111", "T": 29.1, "RH": 65.3 }, "geometry": { "type": "Point", "coordinates": [ 28354.062126312273904, 32539.478435395925771 ] } },
+{ "type": "Feature", "properties": { "station_id": "S102", "T": 29.6, "RH": 74.9 }, "geometry": { "type": "Point", "coordinates": [ 20730.322490422415285, 19099.196756778685085 ] } },
+{ "type": "Feature", "properties": { "station_id": "S24", "T": 28.8, "RH": 69.4 }, "geometry": { "type": "Point", "coordinates": [ 44613.247302534844493, 38870.406742046397994 ] } }
 ]
 }

@@ -1,4 +1,5 @@
 import os
+import subprocess
 from datetime import datetime
 import requests
 import numpy as np
@@ -121,8 +122,16 @@ def idw_interpolate(points_gdf, field, boundary_gdf, cell=CELL_SIZE, power=IDW_P
 # Save raster and clip to boundary polygon
 # --------------------------------------------------------
 def save_and_clip_raster(array2d, transform, crs_epsg, boundary_gdf, out_path):
+    """Save raster and crop it tightly to the boundary extent (no full-extent rectangle)."""
+    import rasterio
+    from rasterio.mask import mask
+    from shapely.geometry import mapping
+    import numpy as np
+
+    # --- Step 1: Write temp unmasked raster ---
+    temp_path = out_path.replace(".tif", "_temp.tif")
     with rasterio.open(
-        out_path,
+        temp_path,
         "w",
         driver="GTiff",
         height=array2d.shape[0],
@@ -131,24 +140,29 @@ def save_and_clip_raster(array2d, transform, crs_epsg, boundary_gdf, out_path):
         dtype=array2d.dtype,
         crs=CRS.from_epsg(crs_epsg),
         transform=transform,
-        compress="lzw",
     ) as dst:
         dst.write(array2d, 1)
 
-    # Clip to boundary polygon
-    with rasterio.open(out_path) as src:
+    # --- Step 2: Proper mask/crop ---
+    with rasterio.open(temp_path) as src:
+        if boundary_gdf.crs != src.crs:
+            boundary_gdf = boundary_gdf.to_crs(src.crs)
         geoms = [mapping(boundary_gdf.unary_union)]
-        clipped, clipped_transform = mask(src, geoms, crop=True)
+        clipped, clipped_transform = mask(src, geoms, crop=True, filled=True, nodata=np.nan)
         meta = src.meta.copy()
-        meta.update(
-            {
-                "height": clipped.shape[1],
-                "width": clipped.shape[2],
-                "transform": clipped_transform,
-            }
-        )
+        meta.update({
+            "height": clipped.shape[1],
+            "width": clipped.shape[2],
+            "transform": clipped_transform,
+            "nodata": np.nan
+        })
+
+    # --- Step 3: Write clipped result ---
     with rasterio.open(out_path, "w", **meta) as dst:
         dst.write(clipped)
+
+    os.remove(temp_path)  # clean up
+    print(f"✅ Saved and tightly clipped raster → {out_path}")
 
 # --------------------------------------------------------
 # Humidex + normalization
@@ -234,6 +248,67 @@ def upload_to_mapbox(file_path, username, dataset_name, access_token):
     print(f"✅ {dataset_name} uploaded to Mapbox. Processing may take 1–3 min.")
 
 # --------------------------------------------------------
+# Convert normalized raster → 8-bit TIFF (preserve NoData)
+# --------------------------------------------------------
+def convert_to_8bit_with_alpha(in_tif, out_tif, boundary_gdf=None):
+    """
+    Pure rasterio version (no GDAL, no ArcPy).
+    Converts a normalized (0–100) GeoTIFF to a clipped RGBA 8-bit GeoTIFF
+    with transparency outside the Singapore boundary (no black edges).
+    Suitable for Mapbox Upload API.
+    """
+    import rasterio
+    from rasterio.mask import mask
+    import numpy as np
+    from shapely.geometry import mapping
+
+    with rasterio.open(in_tif) as src:
+        data = src.read(1).astype("float32")
+        meta = src.meta.copy()
+
+        # --- Optional clipping to boundary polygon ---
+        if boundary_gdf is not None:
+            if boundary_gdf.crs != src.crs:
+                boundary_gdf = boundary_gdf.to_crs(src.crs)
+            geoms = [mapping(boundary_gdf.unary_union)]
+            clipped, transform = mask(src, geoms, crop=True, filled=True, nodata=np.nan)
+            data = clipped[0]
+            meta.update({
+                "height": data.shape[0],
+                "width": data.shape[1],
+                "transform": transform
+            })
+
+        # --- Convert normalized values (0–100) → grayscale 0–255 ---
+        mask_valid = np.isfinite(data)
+        scaled = np.zeros_like(data, dtype="uint8")
+        scaled[mask_valid] = np.clip((data[mask_valid] / 100.0) * 255.0, 0, 255)
+
+        # --- Build RGBA channels ---
+        R = G = B = scaled
+        A = np.where(mask_valid, 255, 0).astype("uint8")
+
+        meta.update({
+            "driver": "GTiff",
+            "dtype": "uint8",
+            "count": 4,            # RGBA
+            "compress": "lzw",
+            "tiled": True,
+            "photometric": "RGB",
+            "nodata": None         # prevents NaN issue for uint8
+        })
+
+        with rasterio.open(out_tif, "w", **meta) as dst:
+            dst.write(R, 1)
+            dst.write(G, 2)
+            dst.write(B, 3)
+            dst.write(A, 4)
+            dst.set_band_description(4, "alpha")
+
+    print(f"✅ Saved RGBA GeoTIFF (Mapbox-ready, transparent edges) → {out_tif}")
+
+
+# --------------------------------------------------------
 # MAIN
 # --------------------------------------------------------
 def main():
@@ -277,18 +352,16 @@ def main():
     points_geojson_web = os.path.join(web_folder, "nea_environment_points_wgs84.geojson")
     pts_wgs84.to_file(points_geojson_web, driver="GeoJSON")
 
-    # 2️⃣ Normalized humidex → 8-bit TIFF
-    humidex_8bit = os.path.join(web_folder, "humidex_norm_8bit.tif")
-    convert_to_8bit(humidex_ras_norm, humidex_8bit)
+     # 2️⃣ Normalized humidex → 8-bit TIFF with transparency + clip
+    humidex_8bit_clipped = os.path.join(web_folder, "humidex_norm_8bit_clipped.tif")
+    convert_to_8bit_with_alpha(humidex_ras_norm, humidex_8bit_clipped, boundary)
 
-    # --------------------------------------------------------
-    # Upload to Mapbox
-    # --------------------------------------------------------
+    # 3️⃣ Upload to Mapbox
     print("Uploading to Mapbox...")
     token = os.getenv("MAPBOX_TOKEN") or mapbox_access_token
 
     upload_to_mapbox(points_geojson_web, mapbox_username, dataset_name, token)
-    upload_to_mapbox(humidex_8bit, mapbox_username, "humidex_raster", token)
+    upload_to_mapbox(humidex_8bit_clipped, mapbox_username, "humidex_raster", token)
 
     print("🎉 All uploads sent to Mapbox.")
 
