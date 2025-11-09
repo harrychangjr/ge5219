@@ -3,11 +3,9 @@
 "name": "nea_environment_points_wgs84",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
-{ "type": "Feature", "properties": { "station_id": "S107", "T": 29.2, "RH": 69.2 }, "geometry": { "type": "Point", "coordinates": [ 103.9625, 1.3135 ] } },
-{ "type": "Feature", "properties": { "station_id": "S44", "T": 28.6, "RH": 73.2 }, "geometry": { "type": "Point", "coordinates": [ 103.68166, 1.34583 ] } },
-{ "type": "Feature", "properties": { "station_id": "S106", "T": 26.1, "RH": 94.7 }, "geometry": { "type": "Point", "coordinates": [ 103.9673, 1.4168 ] } },
-{ "type": "Feature", "properties": { "station_id": "S111", "T": 29.1, "RH": 65.3 }, "geometry": { "type": "Point", "coordinates": [ 103.8365, 1.31055 ] } },
-{ "type": "Feature", "properties": { "station_id": "S102", "T": 29.6, "RH": 74.9 }, "geometry": { "type": "Point", "coordinates": [ 103.768, 1.189 ] } },
-{ "type": "Feature", "properties": { "station_id": "S24", "T": 28.8, "RH": 69.4 }, "geometry": { "type": "Point", "coordinates": [ 103.9826, 1.3678 ] } }
+{ "type": "Feature", "properties": { "station_id": "S107", "T": 30.2, "RH": 73.3 }, "geometry": { "type": "Point", "coordinates": [ 103.9625, 1.3135 ] } },
+{ "type": "Feature", "properties": { "station_id": "S43", "T": 30.8, "RH": 65.6 }, "geometry": { "type": "Point", "coordinates": [ 103.8878, 1.3399 ] } },
+{ "type": "Feature", "properties": { "station_id": "S106", "T": 27.8, "RH": 87.1 }, "geometry": { "type": "Point", "coordinates": [ 103.9673, 1.4168 ] } },
+{ "type": "Feature", "properties": { "station_id": "S24", "T": 28.9, "RH": 75.6 }, "geometry": { "type": "Point", "coordinates": [ 103.9826, 1.3678 ] } }
 ]
 }

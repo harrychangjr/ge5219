@@ -170,9 +170,13 @@ def save_and_clip_raster(array2d, transform, crs_epsg, boundary_gdf, out_path):
 def compute_humidex_raster(temp_arr, rh_arr):
     T = temp_arr.astype("float64")
     RH = rh_arr.astype("float64")
-    e = 6.11 * np.exp(5417.7530 * ((1 / 273.16) - (1 / (273.15 + T))))
-    H = 0.5555 * (e * RH / 100.0 - 10.0)
-    humidex = T + H
+    # Tetens' formula for saturation vapor pressure (in hPa)
+    e_sat = 6.112 * 10 ** ((7.5 * T) / (237.7 + T))
+    # Actual vapor pressure using RH
+    e = RH * e_sat / 100.0
+    # Humidex calculation (as per Sirangelo et al., 2020)
+    humidex = T + (5.0 / 9.0) * (e - 10.0)
+
     return humidex.astype("float32")
 
 def normalize_0_100(arr):
