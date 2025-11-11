@@ -1,36 +1,36 @@
 on:
   schedule:
-    - cron: "*/10 * * * *"  # every 10 minutes (UTC)
+    - cron: "*/10 * * * *"  # run script every 10 minutes (UTC)
   workflow_dispatch:
 
 jobs:
   run-updater:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest #runs on linux vm
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 1️⃣ Install system dependencies (for gssapi)
+      #Install system dependencies
       - name: Install system packages
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y krb5-user libkrb5-dev
 
-      # 2️⃣ Setup Python
+      #Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: "pip"  # ✅ enable built-in pip cache
+          cache: "pip"  
 
-      # 3️⃣ Install dependencies (cached)
+      # Install dependencies (cached)
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install "arcgis==2.3.0" requests
 
-      # 4️⃣ Run weather updater script
+      # Run python script
       - name: Run weather updater
         run: |
           python update_rh_temp.py
