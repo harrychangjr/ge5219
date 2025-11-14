@@ -1,12 +1,15 @@
 # ============================================================
 # fetch_latest_rainfall_to_csv.py
-#
-# Standalone version:
+# 
 #   - Fetch latest rainfall from data.gov.sg
 #   - Join station metadata (lat/lon, name)
 #   - Save clean CSV (+ optional GeoJSON, optional archive)
 #   - No external "rainfall_realtime" package dependencies
 # ============================================================
+# use for terminal run
+# & "C:/Users/zirui/AppData/Local/ESRI/conda/envs/ge5219/python.exe" `
+# "c:/Users/zirui/Desktop/5219 final/rainfall realtime updater/rainfall_realtime_script/fetch_latest_rainfall_to_csv.py" `
+# --out_dir "C:\Users\zirui\Documents\GitHub\ge5219\rainfall realtime updater\output_data"
 
 import os
 import json
@@ -16,33 +19,26 @@ from datetime import datetime, timezone, timedelta
 import pandas as pd
 import requests
 
+# real-time rainfall data are downloaded from:
 API_URL = "https://api.data.gov.sg/v1/environment/rainfall"
 
-
+# simple wrapper to help to print messages with timestamps which allow people to see the progress in terminal
 def log(msg: str) -> None:
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{now}] {msg}")
 
-
+# getting geojson data by sending get request, raise error if thr server returns error message
+# it will return the paesed JSON dict
 def fetch_json(url: str) -> dict:
     """Fetch JSON from given URL with basic error handling."""
     resp = requests.get(url, timeout=30)
     resp.raise_for_status()
     return resp.json()
 
-
+# converts the raw API JSON into a clean dataframe
+# return dataframe with timestamp, rainfall readings, and weather station info
 def parse_latest_item_to_dataframe(payload: dict) -> pd.DataFrame:
-    """
-    Convert the latest items[0] block into a tidy DataFrame.
-
-    Output columns:
-      - Station ID
-      - Station Name
-      - Rainfall (mm/hr)
-      - Reading Time   (ISO string from API)
-      - lat
-      - lon
-    """
+# ensure API returned error message or dataframe
     items = payload.get("items", [])
     if not items:
         raise ValueError("No 'items' in rainfall payload.")
@@ -51,9 +47,10 @@ def parse_latest_item_to_dataframe(payload: dict) -> pd.DataFrame:
     readings = latest.get("readings", [])
     stations = payload.get("metadata", {}).get("stations", [])
 
-    # Index station metadata by id
+    # Index station metadata by id for metadata lookup
     station_meta = {s.get("id"): s for s in stations}
 
+    # loop through all station rainfall readings
     rows = []
     for r in readings:
         sid = r.get("station_id")
@@ -63,7 +60,7 @@ def parse_latest_item_to_dataframe(payload: dict) -> pd.DataFrame:
         loc = meta.get("location", {}) or {}
         lat = loc.get("latitude") or loc.get("lat")
         lon = loc.get("longitude") or loc.get("lon")
-
+    # add the clean row per station with rainfall + coordinates
         rows.append(
             {
                 "Station ID": sid,
@@ -80,9 +77,11 @@ def parse_latest_item_to_dataframe(payload: dict) -> pd.DataFrame:
         return df
 
     # Enforce column order
+    # creates the final tify table with column order
     return df[["Station ID", "Station Name", "Rainfall (mm/hr)", "Reading Time", "lat", "lon"]]
 
-
+# timestamp -> filename tag
+# converts NEA timestamp to Singapore time (GMT+8) and formats as YYYYMMDD_Hour_Minutes. 
 def iso_to_sgt_tag(iso_str: str) -> str:
     """Convert ISO timestamp to compact Singapore-time tag for filenames."""
     if not iso_str:
@@ -94,7 +93,7 @@ def iso_to_sgt_tag(iso_str: str) -> str:
     sgt = dt.astimezone(timezone(timedelta(hours=8)))
     return sgt.strftime("%Y%m%d_%H%M")
 
-
+# saving the output into CSV and geojson (optional)
 def save_outputs(
     df: pd.DataFrame,
     out_dir: str,
@@ -105,18 +104,19 @@ def save_outputs(
 ) -> None:
     os.makedirs(out_dir, exist_ok=True)
 
-    # 1️⃣ Fixed CSV (overwrite each run)
+    # (1) fixed CSV (overwrite each run)
     csv_path = os.path.join(out_dir, f"{prefix}.csv")
     df.to_csv(csv_path, index=False)
     log(f"CSV saved → {csv_path}")
 
-    # 2️⃣ Fixed GeoJSON (optional)
+    # (2) Fixed GeoJSON (optional)
     gj_path = None
     if write_geojson:
         features = []
         for _, row in df.iterrows():
             if pd.isna(row["lat"]) or pd.isna(row["lon"]):
                 continue
+            # build feature collections manually
             features.append(
                 {
                     "type": "Feature",
@@ -138,7 +138,8 @@ def save_outputs(
             json.dump(gj, f, ensure_ascii=False, indent=2)
         log(f"GeoJSON saved → {gj_path}")
 
-    # 3️⃣ Optional archive copies with timestamp tag
+    # (3) Optional archive copies with timestamp tag
+    # If enabled, save timestamped versions which allow to store historical rainfall
     if archive:
         tag = iso_to_sgt_tag(latest_iso)
 
@@ -154,7 +155,7 @@ def save_outputs(
                 dst.write(src.read())
             log(f"Archived GeoJSON → {arch_gj}")
 
-
+# it defines the command line arguments
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Fetch latest rainfall readings → CSV (and optionally GeoJSON)."
@@ -182,6 +183,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    # fetch the latest rainfall and convert to clean dataframe
     log("Requesting latest rainfall payload...")
     payload = fetch_json(API_URL)
 
@@ -192,7 +194,7 @@ def main() -> None:
     log(f"Got {len(df)} station readings.")
 
     latest_iso = payload.get("items", [{}])[0].get("timestamp", "")
-
+    # save CSV output and (optional) geojson and archives
     save_outputs(
         df=df,
         out_dir=args.out_dir,
@@ -204,6 +206,6 @@ def main() -> None:
 
     log("Done.")
 
-
+# script entry
 if __name__ == "__main__":
     main()
