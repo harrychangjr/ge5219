@@ -36,6 +36,7 @@ conda activate ge5219
 This project contains the full end-to-end pipeline for generating and auto-uploading the Singapore Rainfall Comfort Score to Mapbox.  
 Runtime outputs and Python cache folders are separated from the main scripts.
 
+```text
 /<project_root>
 │
 ├── README.md                       ← Project documentation
@@ -51,7 +52,7 @@ Runtime outputs and Python cache folders are separated from the main scripts.
       ├── rainfall_latest.csv
       ├── comfort_score_latest.tif
       └── comfort_score_8bit_3414.tif
-
+```
 
 
 ## Configuration
