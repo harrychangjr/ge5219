@@ -36,7 +36,8 @@ conda activate ge5219
 This project contains the full end-to-end pipeline for generating and auto-uploading the Singapore Rainfall Comfort Score to Mapbox.  
 Runtime outputs and Python cache folders are separated from the main scripts.
 
-/<project_root>
+```text
+/`<project_root>`
 │
 ├── README.md                       ← Project documentation
 │
@@ -45,13 +46,13 @@ Runtime outputs and Python cache folders are separated from the main scripts.
 │     ├── fetch_latest_rainfall_to_csv.py        ← Fetch real-time rainfall API
 │     ├── from_csv_to_comfort.py                 ← Generate comfort raster (ArcGIS)
 │     ├── comfort_raster_to_mapbox_tileset.py    ← Normalize & prep for Mapbox upload
-│     └── __pycache__/                            ← Auto-generated Python bytecode (ignored)
+│     └── __pycache__/                           ← Auto-generated Python bytecode (ignored)
 │
 └── output_data/                    ← Automatically generated outputs 
       ├── rainfall_latest.csv
       ├── comfort_score_latest.tif
       └── comfort_score_8bit_3414.tif
-
+```
 
 
 ## Configuration
