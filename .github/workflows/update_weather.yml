@@ -3,50 +3,53 @@ name: Update Humidex and NEA Layers
 on:
   schedule:
     - cron: "*/10 * * * *"  # every 10 minutes (UTC)
-  workflow_dispatch:        # <-- only defines manual trigger
+  workflow_dispatch:        # allows manual trigger
 
 jobs:
   run-updater:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use latest Ubuntu runner for the workflow
 
     steps:
-      # 1️⃣ Checkout repo
+      # Checkout repo
+      # Pulls the latest version of the repository into the action runner
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python
+      # Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.10" # Specify the Python version to use
 
-      # 3️⃣ Install dependencies
+      # Install dependencies
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
           pip install requests geopandas shapely rasterio pyproj boto3 numpy
 
-      # 4️⃣ Run the updater script
+      # Run the main python script
       - name: Run weather updater
         env:
           MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
         run: |
-          python mapbox/webapp.py
+          python Scripts/thermal_comfort.py
 
-      # 5️⃣ Commit and push updated files
+      # Commit and push updated files back to the repo
       - name: Commit and push updated files
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
+          
+          # Stage the updated files
           git add Data/nea_environment_points.geojson || true
           git add Data/humidex_svy21_norm.tif || true
           git add Data/web/nea_environment_points_wgs84.geojson || true
           git add Data/web/humidex_norm_8bit.tif || true
 
+          # Commit only if there are changes
           git diff --cached --quiet || git commit -m "Auto-update NEA layers"
 
-          # ✅ Push using the GitHub Actions token for authentication
+          # Push to repo using github token
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
